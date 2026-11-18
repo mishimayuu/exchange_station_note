@@ -1,0 +1,82 @@
+/* 配色: 淡い黄色 + 黒い細線 + 青い影（参考ゲームのテイスト） */
+:root { --yellow: #f6e2da; --ink: #262033; --blue: #4d5b98; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
+  background: #000; color: var(--ink);
+}
+#app { max-width: 760px; height: 100%; margin: 0 auto; display: flex; flex-direction: column; }
+
+#topbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; font-size: 14px; color: var(--yellow); }
+#topbar[hidden] { display: none; }
+
+/* 二重線の枠（会話ウィンドウ風） */
+.frame { background: var(--yellow); color: var(--ink); border: 3px double var(--ink); }
+button {
+  font: inherit; cursor: pointer; color: var(--ink);
+  background: var(--yellow); border: 3px double var(--ink); border-radius: 0; padding: 8px 14px;
+}
+button:hover { background: #fff1ec; }
+#topbar button { font-size: 13px; padding: 4px 10px; }
+
+#stage {
+  position: relative; flex: 1; margin: 0 12px 12px; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: flex-end; padding: 16px;
+  cursor: pointer; user-select: none; transition: background-color .8s;
+  background-color: var(--yellow);
+}
+/* 地の色は常に黄色。時間帯や天気は半透明の重ね塗りで表現 */
+#stage::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
+#stage.rain::after  { background: repeating-linear-gradient(105deg, transparent 0 16px, rgba(38,32,51,.35) 16px 17px); animation: rain .5s linear infinite; }
+#stage.storm::after { background: repeating-linear-gradient(115deg, transparent 0 10px, rgba(38,32,51,.45) 10px 11.5px); animation: rain .3s linear infinite; }
+#stage.dusk::after  { background: rgba(255,150,90,.14); }
+#stage.night::after { background: rgba(10,20,60,.35); }
+@keyframes rain { to { background-position: -30px 60px; } }
+#bg { position: absolute; inset: -10px; z-index: 0; pointer-events: none; background-repeat: no-repeat; background-position: center bottom; background-size: cover; }
+#bg.shake { animation: shake .5s ease-in-out infinite; }
+@keyframes shake { 0%,100% { transform: translate(0,0); } 25% { transform: translate(1px,5px); } 50% { transform: translate(3px,0); } 75% { transform: translate(-2px,5px); } }
+#fade { position: absolute; inset: 0; z-index: 4; background: #000; opacity: 0; pointer-events: none; transition: opacity 3s ease; }
+#fade.on { opacity: 1; }
+#sfx { position: absolute; top: 12px; right: 16px; z-index: 2; font-size: 15px; letter-spacing: .12em; padding: 3px 10px; background: var(--yellow); border: 2px solid var(--ink); }
+#sfx:empty { display: none; }
+#dayBox, #notebook, #choices, #hint, #loc { position: relative; z-index: 1; }
+
+#loc { position: absolute; top: 12px; left: 16px; font-size: 13px; padding: 3px 10px; background: var(--yellow); border: 2px solid var(--ink); }
+#loc:empty { display: none; }
+
+#dayBox { background: var(--yellow); color: var(--ink); border: 3px double var(--ink); padding: 14px 18px; min-height: 130px; }
+#who { font-weight: 700; color: var(--blue); margin-bottom: 4px; min-height: 1.2em; }
+#dayText, #noteText { margin: 0; line-height: 1.9; white-space: pre-wrap; font-size: 17px; }
+
+#notebook { flex: 1; display: flex; align-items: center; justify-content: center; padding: 36px 0 8px; overflow: auto; }
+#notebook[hidden] { display: none; }
+.paper {
+  width: 100%; max-width: 560px; padding: 20px 26px;
+  background: repeating-linear-gradient(#fffdf0, #fffdf0 31px, #cfd8e0 32px);
+  border: 2px solid var(--ink); box-shadow: 6px 6px 0 var(--blue); color: #1f2a55;
+  font-family: "Zen Kurenaido", "Hiragino Mincho ProN", serif;
+}
+.paper.me { color: #4a4a4a; }
+.paper.cover { text-align: center; background: #e3e8f6; border-width: 3px; font-size: 22px; padding: 34px 26px; }
+.paper.cover #noteText { font-size: 22px; line-height: 2; }
+.paper .by { font-family: "Zen Maru Gothic", sans-serif; font-size: 12px; color: #6a7a88; margin-bottom: 6px; }
+.paper #noteText { font-size: 19px; line-height: 32px; color: inherit; }
+
+#choices { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+#choices:empty { display: none; }
+#choices button { text-align: left; line-height: 1.6; white-space: pre-wrap; }
+#hint { text-align: right; font-size: 12px; color: var(--ink); opacity: .7; margin-top: 8px; min-height: 1em; }
+
+#ending, #titleScreen {
+  position: fixed; inset: 0; background: rgba(0,0,0,.85); display: flex; align-items: center; justify-content: center; z-index: 10; padding: 16px;
+}
+#ending[hidden], #titleScreen[hidden] { display: none; }
+.modal-body, .ending-body { background: var(--yellow); color: var(--ink); border: 3px double var(--ink); padding: 22px; max-width: 560px; width: 100%; max-height: 90%; overflow: auto; }
+.modal-body h2, .ending-body h2 { margin-top: 0; }
+#endStats { padding-left: 1.2em; line-height: 1.8; }
+#titleScreen { flex-direction: column; text-align: center; gap: 10px; background: var(--yellow); color: var(--ink); }
+#titleScreen h1 { font-size: 44px; letter-spacing: .2em; margin: 0; text-shadow: 3px 3px 0 var(--blue); }
+#titleScreen .sub { margin: 0 0 16px; }
+#titleScreen .note { font-size: 12px; opacity: .7; }
+#titleScreen button { min-width: 200px; }
